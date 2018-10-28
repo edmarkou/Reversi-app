@@ -1,32 +1,61 @@
 .App {
   text-align: center;
 }
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
+.App-container {
+  display: inline-grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  background-color: saddlebrown;
+  padding: 10px;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.grid-item {
+  background-color: rosybrown;
+  border: 1px solid saddlebrown;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  transition: all 0.5s;
 }
-
-.App-link {
-  color: #61dafb;
+.grid-item:hover {
+  background-color: rgba(255, 188, 183, 0.8);
+  border: 1px solid #ff720c;
+  cursor: pointer;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.white {
+  height: 50px;
+  width: 50px;
+  background-color: white;
+  border-radius: 50%;
+  display: inline-block;
+}
+.black {
+  height: 50px;
+  width: 50px;
+  background-color: black;
+  border-radius: 50%;
+  display: inline-block;
+}
+.turnText {
+  font-size: 40px;
+  font-family: cursive;
+  font-weight: bold;
+  cursor: default;
+}
+.scoreText {
+  font-size: 40px;
+  font-family: cursive;
+  font-weight: bold;
+  cursor: default;
+}
+.score {
+  display: block;
+  padding: 5px;
+}
+.scoreItem {
+  display: inline-block;
+  background-color: rosybrown;
+  border: 3px solid saddlebrown;
+  text-align: center;
+  font-family: sans-serif;
+  padding: 25px;
+  border-radius: 30%;
 }
