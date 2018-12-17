@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Scoreboard from "./Scoreboard";
 
 class App extends Component {
   constructor(props) {
@@ -13,7 +14,8 @@ class App extends Component {
       winner: ''
     }
   }
-  componentWillMount() {
+
+  getNewTable() {
     let x = new Array(8);
     for(let i = 0; i < x.length; i++) {
       x[i] = new Array(8);
@@ -23,7 +25,20 @@ class App extends Component {
     x[4][4] = 1;
     x[3][4] = 2;
     x[4][3] = 2;
-    this.setState({items: x});
+    return x;
+  }
+
+  restartGame() {
+    this.setState({items: this.getNewTable(),
+      blackScore: 0,
+      whiteScore: 0,
+      blacksTurn: true,
+      endGame: false,
+      winner: ''});
+  }
+
+  componentWillMount() {
+    this.setState({items: this.getNewTable()})
   }
 
   componentDidMount() {
@@ -42,6 +57,7 @@ class App extends Component {
     let winner = blackScore === whiteScore ? "Draw!" : (blackScore > whiteScore ? "Black wins!" : "White wins!");
     this.setState({blackScore: blackScore, whiteScore: whiteScore, winner: winner});
   }
+
   clickedPad(e) {
     if (e.target.id) {
       let i = e.target.id.charAt(0);
@@ -58,17 +74,20 @@ class App extends Component {
     }
   }
   checkMove(y, x) {
-    if (y === '0') return (this.checkBottomRight(y, x) || this.checkBottom(y, x) || this.checkBottomLeft(y, x) ||
-      this.checkLeft(y, x) || this.checkRight(y, x) );
-    else if (y === '7') return (this.checkTop(y, x) || this.checkTopLeft(y, x) || this.checkTopRight(y, x) ||
-      this.checkLeft(y, x) || this.checkRight(y, x) );
-    else return (this.checkTop(y, x) || this.checkTopLeft(y, x) || this.checkTopRight(y, x) ||
-      this.checkBottomRight(y, x) || this.checkBottom(y, x) || this.checkBottomLeft(y, x) ||
-        this.checkLeft(y, x) || this.checkRight(y, x) );
-  }
-  checkTop(y, x) {
     let m = (this.state.blacksTurn ? 1 : 2);
     let n = (this.state.blacksTurn ? 2 : 1);
+    if (y === '0')
+      return (this.checkBottomRight(y, x, m, n) || this.checkBottom(y, x, m, n) || this.checkBottomLeft(y, x, m, n) ||
+        this.checkLeft(y, x, m, n) || this.checkRight(y, x, m, n) );
+    else if (y === '7')
+      return (this.checkTop(y, x, m, n) || this.checkTopLeft(y, x, m, n) || this.checkTopRight(y, x, m, n) ||
+        this.checkLeft(y, x, m, n) || this.checkRight(y, x, m, n));
+    else
+      return (this.checkTop(y, x, m, n) || this.checkTopLeft(y, x, m, n) || this.checkTopRight(y, x, m, n) ||
+        this.checkBottomRight(y, x, m, n) || this.checkBottom(y, x, m, n) || this.checkBottomLeft(y, x, m, n) ||
+        this.checkLeft(y, x, m, n) || this.checkRight(y, x, m, n));
+  }
+  checkTop(y, x, m, n) {
     if (this.state.items[y - 1][x] === m) {
       for(let i = 0; i < y; i++) {
         if (this.state.items[i][x] === n) return true;
@@ -76,9 +95,7 @@ class App extends Component {
     }
     return false;
   }
-  checkLeft(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkLeft(y, x, m, n) {
     if (this.state.items[y][x - 1] === m) {
       for(let i = 0; i < x; i++) {
         if (this.state.items[y][i] === n) return true;
@@ -86,9 +103,7 @@ class App extends Component {
     }
     return false;
   }
-  checkRight(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkRight(y, x, m, n) {
     if (this.state.items[y][x-0+1] === m) {
       for(let i = 7; i > x; i--) {
         if (this.state.items[y][i] === n) return true;
@@ -96,9 +111,7 @@ class App extends Component {
     }
     return false;
   }
-  checkBottom(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkBottom(y, x, m, n) {
     if (this.state.items[y-0+1][x] === m) {
       for(let i = 7; i > y; i--) {
         if (this.state.items[i][x] === n) return true;
@@ -106,9 +119,7 @@ class App extends Component {
     }
     return false;
   }
-  checkTopLeft(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkTopLeft(y, x, m, n) {
     if (this.state.items[y - 1][x - 1] === m) {
       for(let i = 1; i < 7; i++) {
         if(y - i < 0 || x - i < 0) break;
@@ -117,9 +128,7 @@ class App extends Component {
     }
     return false;
   }
-  checkTopRight(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkTopRight(y, x, m, n) {
     if (this.state.items[y - 1][x-0+1] === m) {
       for(let i = 1; i < 7; i++) {
         if(y - i < 0 || x-0+i > 7) break;
@@ -128,9 +137,7 @@ class App extends Component {
     }
     return false;
   }
-  checkBottomRight(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkBottomRight(y, x, m, n) {
     if (this.state.items[y-0+1][x-0+1] === m) {
       for(let i = 1; i < 7; i++) {
         if(y-0+i > 7 || x-0+i > 7) break;
@@ -139,9 +146,7 @@ class App extends Component {
     }
     return false;
   }
-  checkBottomLeft(y, x) {
-    let m = (this.state.blacksTurn ? 1 : 2);
-    let n = (this.state.blacksTurn ? 2 : 1);
+  checkBottomLeft(y, x, m, n) {
     if (this.state.items[y-0+1][x - 1] === m) {
       for(let i = 1; i < 7; i++) {
         if(y-0+i > 7 || x - i < 0) break;
@@ -152,41 +157,42 @@ class App extends Component {
   }
 
   replaceTokens(y, x) {
+    let m = (this.state.blacksTurn ? 1 : 2);
+    let n = (this.state.blacksTurn ? 2 : 1);
     let items = this.state.items;
-    let number = this.state.blacksTurn ? 2 : 1;
     if(y !== '0'){
-      if (this.checkTop(y, x)) {
+      if (this.checkTop(y, x, m, n)) {
         let found = false;
         for (let i = 0; i < y; i++) {
-          if (items[i][x] === number) found = true;
-          if (found) items[i][x] = number;
+          if (items[i][x] === n) found = true;
+          if (found) items[i][x] = n;
         }
       }
     }
     if(y !== '7'){
-      if (this.checkBottom(y, x)) {
+      if (this.checkBottom(y, x, m, n)) {
         let found = false;
         for (let i = 7; i > y; i--) {
-          if (items[i][x] === number) found = true;
-          if (found) items[i][x] = number;
+          if (items[i][x] === n) found = true;
+          if (found) items[i][x] = n;
         }
       }
     }
     if(x !== '0'){
-      if (this.checkLeft(y, x)) {
+      if (this.checkLeft(y, x, m, n)) {
         let found = false;
         for (let i = 0; i < x; i++) {
-          if (items[y][i] === number) found = true;
-          if (found) items[y][i] = number;
+          if (items[y][i] === n) found = true;
+          if (found) items[y][i] = n;
         }
       }
     }
     if(x !== '7'){
-      if (this.checkRight(y, x)) {
+      if (this.checkRight(y, x, m, n)) {
         let found = false;
         for (let i = 7; i > x; i--) {
-          if (items[y][i] === number) found = true;
-          if (found) items[y][i] = number;
+          if (items[y][i] === n) found = true;
+          if (found) items[y][i] = n;
         }
       }
     }
@@ -199,11 +205,11 @@ class App extends Component {
         yy--;
         xx--;
       }
-      if (this.checkTopLeft(y, x)) {
+      if (this.checkTopLeft(y, x, m, n)) {
         let found = false;
         for (let i = times; i > 0; i--) {
-          if (items[yy][xx] === number) found = true;
-          if (found) items[yy][xx] = number;
+          if (items[yy][xx] === n) found = true;
+          if (found) items[yy][xx] = n;
           yy++;
           xx++;
         }
@@ -218,11 +224,11 @@ class App extends Component {
         yy--;
         xx++;
       }
-      if (this.checkTopRight(y, x)) {
+      if (this.checkTopRight(y, x, m, n)) {
         let found = false;
         for (let i = times; i > 0; i--) {
-          if (items[yy][xx] === number) found = true;
-          if (found) items[yy][xx] = number;
+          if (items[yy][xx] === n) found = true;
+          if (found) items[yy][xx] = n;
           yy++;
           xx--;
         }
@@ -237,11 +243,11 @@ class App extends Component {
         yy++;
         xx++;
       }
-      if (this.checkBottomRight(y, x)) {
+      if (this.checkBottomRight(y, x, m, n)) {
         let found = false;
         for (let i = times; i > 0; i--) {
-          if (items[yy][xx] === number) found = true;
-          if (found) items[yy][xx] = number;
+          if (items[yy][xx] === n) found = true;
+          if (found) items[yy][xx] = n;
           yy--;
           xx--;
         }
@@ -256,11 +262,11 @@ class App extends Component {
         yy++;
         xx--;
       }
-      if (this.checkBottomLeft(y, x)) {
+      if (this.checkBottomLeft(y, x, m, n)) {
         let found = false;
         for (let i = times; i > 0; i--) {
-          if (items[yy][xx] === number) found = true;
-          if (found) items[yy][xx] = number;
+          if (items[yy][xx] === n) found = true;
+          if (found) items[yy][xx] = n;
           yy--;
           xx++;
         }
@@ -282,10 +288,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className={"scoreText"}>Score</div>
-        <div className={"score"}>
-          <div style={{marginRight: '20px'}} className={"scoreItem"}>Black: {this.state.blackScore}</div>
-          <div className={"scoreItem"}>White: {this.state.whiteScore}</div>
-        </div>
+        <Scoreboard whiteScore={this.state.whiteScore} blackScore={this.state.blackScore}/>
         <div className="App-container">
           {this.state.items.map((column, columnIndex) => {
             return (
@@ -301,7 +304,12 @@ class App extends Component {
             )
           })}
         </div>
-        {this.state.endGame ? <div className={"turnText"}>{this.state.winner}</div>
+        {this.state.endGame ? <div>
+            <div className={"turnText"}>{this.state.winner}</div>
+            <div>
+              <button onClick={() => this.restartGame()}>Restart game</button>
+            </div>
+          </div>
           :
           <div className={"turnText"}>{this.state.blacksTurn ? "Black " : "White "} player's turn</div>}
       </div>
